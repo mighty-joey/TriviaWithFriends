@@ -1,0 +1,22 @@
+.header {
+    padding: 1em;
+    display: grid;
+    grid-template-columns: 75% 25%;
+    background-color: #ccd8ff;
+    align-items: center;
+}
+
+.authentication-button {
+    float: right;
+}
+
+.my-games {
+    text-decoration: none;
+    color: #000;
+}
+
+.my-games:hover {
+    cursor: pointer;
+    color: #000;
+}
+

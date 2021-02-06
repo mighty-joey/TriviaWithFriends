@@ -1,14 +1,19 @@
-import ReactDOM from "react-dom";
-import Game from "./components/game";
-import "./index.css";
-import { BrowserRouter } from "react-router-dom";
-import Auth0ProviderWithHistory from "./auth/auth0-provider";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import { Auth0Provider } from '@auth0/auth0-react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Auth0ProviderWithHistory>
-      <Game />
-    </Auth0ProviderWithHistory>
-  </BrowserRouter>,
-  document.getElementById("root")
+
+    <Auth0Provider
+        domain={domain}
+        clientId={clientId}
+        redirectUri={window.location.origin}>
+        <App />
+    </Auth0Provider>,
+    document.getElementById('root')
 );
