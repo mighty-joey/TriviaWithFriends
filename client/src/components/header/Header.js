@@ -9,7 +9,9 @@ const Header = () => {
     return (
         <div className="header">
             <div>
-                <span className="h3">Trivia With Friends</span>
+                <a href="/" className="h3 home-button"><span >Trivia With Friends</span></a>
+            </div>
+            <div>
                 {isAuthenticated && <a href="/games"
                     className="h5 ps-4 my-games"><span>My Games</span></a>}
             </div>

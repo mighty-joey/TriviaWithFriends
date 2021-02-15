@@ -1,91 +1,92 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react';
 import { Link } from 'react-router-dom';
+import GamesService from '../games/games.service';
+import ConfirmModal from '../modal/ConfirmModal';
+import { useHistory } from 'react-router-dom';
 
 const Games = () => {
-    const { isAuthenticated } = useAuth0();
+    const { isAuthenticated, user } = useAuth0();
+    const [games, setGames] = useState([]);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [idToDelete, setIdToDelete] = useState();
 
-    const games = [
-        {
-            name: 'Game 1',
-            numberRounds: 4,
-            bonusQuestions: false,
-            halftimeQuestion: true,
-            themeRound: 4,
-            finalWager: 15,
-            questions: [
-                {
-                    prompt: 'This is prompt 1',
-                    answer: 'This is answer 1'
-                },
-                {
-                    prompt: 'This is prompt 2',
-                    answer: 'This is answer 2'
-                },
-                {
-                    prompt: 'This is prompt 3',
-                    answer: 'This is answer 3'
-                },
-                {
-                    prompt: 'This is prompt 4',
-                    answer: 'This is answer 4'
-                },
-                {
-                    prompt: 'This is prompt 5',
-                    answer: 'This is answer 5'
-                },
-                {
-                    prompt: 'This is prompt 6',
-                    answer: 'This is answer 6'
-                },
-            ]
-        }
-    ];
+    const history = useHistory();
+
+    useEffect(() => {
+        getGames();
+
+    }, [user.sub]);
+
+    const getGames = () => {
+        const userId = user.sub;
+
+        GamesService.fetchGames(userId).then(response => {
+            setGames(response.data);
+        },
+            () => {
+
+            });
+    };
+
+    const displayGames = games => {
+        return games.map((game) => (
+            <tr>
+                <td className="align-middle"><button className="btn btn-success">Start</button></td>
+                <td className="align-middle">{game.name}</td>
+                <td className="align-middle"><Link to={{ pathname: "/game", state: { game } }}><i className="far fa-pencil text-primary pe-4"></i></Link></td>
+                <td className="align-middle"><button className="btn" onClick={() => handleOnClickDeleteGame(game._id)}><i className="far fa-trash text-danger"></i></button></td>
+            </tr>
+        ));
+    };
+
+    const handleOnClickDeleteGame = (id) => {
+        setIdToDelete(id);
+        setIsConfirmModalOpen(true);
+    }
+
+    const deleteGame = gameId => {
+        GamesService.deleteGame(gameId).then(() => {
+            history.push('/games');
+            getGames();
+        }, () => {
+
+        });
+
+        setIsConfirmModalOpen(false);
+    }
 
     return isAuthenticated && (
-        <div className="pt-5">
-            <div className="row">
-                <div className="col-12">
-                    <Link to={{ pathname: "/game", state: { game: {} } }}>
-                        <button className="btn btn-primary">Create New Game</button>
-                    </Link>
+        <>
+            <div className="pt-5">
+                <div className="row">
+                    <div className="col-12">
+                        <Link to={{ pathname: "/game", state: { game: undefined, userId: user.sub } }}>
+                            <button className="btn btn-primary">Create New Game</button>
+                        </Link>
+                    </div>
                 </div>
-            </div>
-            <div className="row pt-4">
-                <div className="col-12">
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">Play Game</th>
-                                <th scope="col">Game Name</th>
-                                <th scope="col">Number of Rounds</th>
-                                <th scope="col">Bonus Questions?</th>
-                                <th scope="col">Halftime Question?</th>
-                                <th scope="col">Theme Round?</th>
-                                <th scope="col">Final Question Wager</th>
-                                <th scope="col">Edit</th>
-                                <th scope="col">Delete</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {games.map((game) => (
+                <div className="row pt-4">
+                    <div className="col-12">
+                        <table className="table table-hover">
+                            <thead>
                                 <tr>
-                                    <td><button className="btn btn-success">Start</button></td>
-                                    <td>{game.name}</td>
-                                    <td>{game.numberRounds}</td>
-                                    <td>{game.bonusQuestions ? 'Yes' : 'No'}</td>
-                                    <td>{game.halftimeQuestion ? 'Yes' : 'No'}</td>
-                                    <td>{game.themeRound > 0 ? game.themeRound : 'None'}</td>
-                                    <td>{game.finalWager}</td>
-                                    <td><Link to={{ pathname: "/game", state: { game } }}><i className="far fa-pencil text-primary pe-4"></i></Link></td>
-                                    <td><i className="far fa-trash text-danger"></i></td>
+                                    <th style={{ width: "10%" }} scope="col">Play Game</th>
+                                    <th style={{ width: "70%" }} scope="col">Game Name</th>
+                                    <th style={{ width: "10%" }} scope="col">Edit</th>
+                                    <th style={{ width: "10%" }} scope="col">Delete</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {games && displayGames(games)}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+            <ConfirmModal showModal={isConfirmModalOpen} hideModal={() => setIsConfirmModalOpen(false)} handleOnClickConfirm={deleteGame}
+                id={idToDelete} message="Are you sure you want to delete this game?" header="Confirm" />
+        </>
     )
 }
 

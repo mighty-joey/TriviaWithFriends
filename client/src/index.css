@@ -1,7 +1,7 @@
 .header {
     padding: 1em;
     display: grid;
-    grid-template-columns: 75% 25%;
+    grid-template-columns: 25% 55% 20%;
     background-color: #ccd8ff;
     align-items: center;
 }
@@ -10,13 +10,18 @@
     float: right;
 }
 
-.my-games {
+.my-games, .home-button {
     text-decoration: none;
     color: #000;
 }
 
-.my-games:hover {
+.my-games:hover, .home-button:hover {
+    text-decoration: none;
     cursor: pointer;
     color: #000;
 }
 
+.my-games:active, .home-button:active {
+    text-decoration: none;
+    color: #000;
+}
